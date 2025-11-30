@@ -1,4 +1,12 @@
 ```
+~ make run-whispercpp
+```
+
+```
+~ make test-whispercpp AUDIO_FILE=2025-11-28_10-04-59_session_1764299099.wav
+```
+
+```
 ~ make help
 Usage: make [target]
 
@@ -29,12 +37,4 @@ Targets:
   clean-whisperx       Clean whisperx virtual environment
   distclean            Remove all build artifacts and environments (keeps submodules)
   install              Install whisper-server to PREFIX
-```
-
-```
-~ make run-whispercpp
-```
-
-```
-~ make test-whispercpp AUDIO_FILE=2025-11-28_10-04-59_session_1764299099.wav
 ```
