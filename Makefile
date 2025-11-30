@@ -24,8 +24,9 @@ WHISPERCPP_PORT ?= 8777
 
 # faster-whisper settings
 PYTHON ?= python
-FASTER_WHISPER_DIR := wrapper/faster-whisper
-FASTER_WHISPER_SUBMODULE := faster-whisper
+FASTER_WHISPER_REPO := https://github.com/SYSTRAN/faster-whisper.git
+FASTER_WHISPER_CLONE_DIR := faster-whisper
+FASTER_WHISPER_DIR := w/faster-whisper
 FASTER_WHISPER_VENV := $(FASTER_WHISPER_DIR)/.venv
 FASTER_WHISPER_MODEL ?= base.en
 FASTER_WHISPER_HOST ?= 0.0.0.0
@@ -34,8 +35,9 @@ FASTER_WHISPER_DEVICE ?= auto
 FASTER_WHISPER_COMPUTE_TYPE ?= default
 
 # whisperx settings
-WHISPERX_DIR := wrapper/whisperx
-WHISPERX_SUBMODULE := whisperx
+WHISPERX_REPO := https://github.com/m-bain/whisperX.git
+WHISPERX_CLONE_DIR := whisperx
+WHISPERX_DIR := w/whisperx
 WHISPERX_VENV := $(WHISPERX_DIR)/.venv
 WHISPERX_MODEL ?= base.en
 WHISPERX_HOST ?= 0.0.0.0
@@ -65,40 +67,44 @@ help:  ## Show this help message
 setup: setup-whispercpp setup-faster-whisper setup-whisperx  ## Initialize all components
 
 .PHONY: setup-whispercpp
-setup-whispercpp:  ## Initialize whisper.cpp submodule
-	@if [ ! -f "$(WHISPERCPP_DIR)/.git" ] && [ ! -d "$(WHISPERCPP_DIR)/.git" ]; then \
-		echo "Initializing whisper.cpp submodule..."; \
-		git submodule update --init $(WHISPERCPP_DIR); \
+setup-whispercpp:  ## Clone whisper.cpp if not present
+	@if [ ! -d "$(WHISPERCPP_DIR)" ]; then \
+		echo "Cloning whisper.cpp..."; \
+		git clone https://github.com/ggerganov/whisper.cpp.git $(WHISPERCPP_DIR); \
 	else \
-		echo "whisper.cpp submodule already initialized"; \
+		echo "whisper.cpp already exists"; \
 	fi
 
 .PHONY: setup-faster-whisper
 setup-faster-whisper:  ## Set up faster-whisper Python environment
-	@if [ ! -f "$(FASTER_WHISPER_SUBMODULE)/.git" ] && [ ! -d "$(FASTER_WHISPER_SUBMODULE)/.git" ]; then \
-		echo "Initializing faster-whisper submodule..."; \
-		git submodule update --init $(FASTER_WHISPER_SUBMODULE); \
+	@if [ ! -d "$(FASTER_WHISPER_CLONE_DIR)" ]; then \
+		echo "Cloning faster-whisper..."; \
+		git clone $(FASTER_WHISPER_REPO) $(FASTER_WHISPER_CLONE_DIR); \
+	else \
+		echo "faster-whisper already exists"; \
 	fi
 	@if [ ! -d "$(FASTER_WHISPER_VENV)" ]; then \
 		echo "Creating faster-whisper virtual environment..."; \
 		$(PYTHON) -m venv $(FASTER_WHISPER_VENV); \
 		$(FASTER_WHISPER_VENV)/bin/pip install --upgrade pip; \
-		$(FASTER_WHISPER_VENV)/bin/pip install -e $(FASTER_WHISPER_SUBMODULE); \
+		$(FASTER_WHISPER_VENV)/bin/pip install -r $(FASTER_WHISPER_DIR)/requirements.txt; \
 	else \
 		echo "faster-whisper venv already exists"; \
 	fi
 
 .PHONY: setup-whisperx
 setup-whisperx:  ## Set up whisperx Python environment
-	@if [ ! -f "$(WHISPERX_SUBMODULE)/.git" ] && [ ! -d "$(WHISPERX_SUBMODULE)/.git" ]; then \
-		echo "Initializing whisperx submodule..."; \
-		git submodule update --init $(WHISPERX_SUBMODULE); \
+	@if [ ! -d "$(WHISPERX_CLONE_DIR)" ]; then \
+		echo "Cloning whisperx..."; \
+		git clone $(WHISPERX_REPO) $(WHISPERX_CLONE_DIR); \
+	else \
+		echo "whisperx already exists"; \
 	fi
 	@if [ ! -d "$(WHISPERX_VENV)" ]; then \
 		echo "Creating whisperx virtual environment..."; \
 		$(PYTHON) -m venv $(WHISPERX_VENV); \
 		$(WHISPERX_VENV)/bin/pip install --upgrade pip; \
-		$(WHISPERX_VENV)/bin/pip install -e $(WHISPERX_SUBMODULE); \
+		$(WHISPERX_VENV)/bin/pip install -r $(WHISPERX_DIR)/requirements.txt; \
 	else \
 		echo "whisperx venv already exists"; \
 	fi
@@ -254,12 +260,6 @@ distclean:  ## Remove all build artifacts and environments (keeps submodules)
 	@rm -rf $(FASTER_WHISPER_VENV)
 	@rm -rf $(WHISPERX_VENV)
 
-.PHONY: submodule-clean
-submodule-clean:  ## Deinitialize all submodules
-	@echo "Deinitializing submodules..."
-	@git submodule deinit -f $(WHISPERCPP_DIR) 2>/dev/null || true
-	@git submodule deinit -f $(FASTER_WHISPER_SUBMODULE) 2>/dev/null || true
-	@git submodule deinit -f $(WHISPERX_SUBMODULE) 2>/dev/null || true
 
 #######################################
 # Install targets

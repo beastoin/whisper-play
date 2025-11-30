@@ -5,4 +5,8 @@ venv/
 env/
 .env
 
+/whisper.cpp/
+/faster-whisper/
+/whisperx/
+
 x.sh
