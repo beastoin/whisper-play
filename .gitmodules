@@ -1,0 +1,11 @@
+[submodule "whisper.cpp"]
+	path = whisper.cpp
+	url = https://github.com/ggerganov/whisper.cpp.git
+
+[submodule "faster-whisper"]
+	path = faster-whisper
+	url = https://github.com/SYSTRAN/faster-whisper.git
+
+[submodule "whisperx"]
+	path = whisperx
+	url = https://github.com/m-bain/whisperX.git

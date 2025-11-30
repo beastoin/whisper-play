@@ -1,0 +1,8 @@
+.aider*
+
+.venv/
+venv/
+env/
+.env
+
+x.sh
